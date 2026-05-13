@@ -2,7 +2,6 @@
 
 import { createClient as createBrowserClient } from "@/utils/supabase/client";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Session } from "inspector";
 import {
   createContext,
   useCallback,
@@ -37,7 +36,11 @@ export function SessionNotesProvider({
 
   const refreshSessionNotes = useCallback(async () => {
     if (sessionId) {
-      const notes = await getSessionNotes({ supabase, sessionId });
+      const notes = await getSessionNotes({
+        supabase: supabase as any,
+        sessionId,
+      });
+
       setNotes(notes || []);
     }
   }, [supabase, sessionId]);
@@ -67,9 +70,8 @@ async function getSessionNotes({
   supabase: SupabaseClient;
   sessionId: string;
 }) {
-
-  const { data : notes } = await supabase.rpc("select_session_notes", {
-    session_id_arg: sessionId
+  const { data: notes } = await supabase.rpc("select_session_notes", {
+    session_id_arg: sessionId,
   });
 
   return notes;
